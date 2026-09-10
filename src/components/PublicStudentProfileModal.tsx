@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { X, Award, FileText, Medal, Trophy, Star, BookOpen, User, GraduationCap, Building2 } from 'lucide-react';
 import { Student, ActivitySubmission, IssuedCertificate, FeaturedStudentTitle, AchievementBadge } from '../types';
 

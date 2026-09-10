@@ -444,6 +444,30 @@ export const AdminPanel: React.FC = () => {
   const [studentFormBatch, setStudentFormBatch] = useState('2023-2026');
   const [studentFormAvatar, setStudentFormAvatar] = useState('');
   const [studentFormBio, setStudentFormBio] = useState('');
+  const [studentSearchTerm, setStudentSearchTerm] = useState('');
+
+  // Stably sorted student list to prevent layout jitter / thrashing
+  const sortedStudents = useMemo(() => {
+    return [...students].sort((a, b) => {
+      const rankA = a.rank ?? 9999;
+      const rankB = b.rank ?? 9999;
+      if (rankA !== rankB) return rankA - rankB;
+      if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+      return a.admissionNumber.localeCompare(b.admissionNumber);
+    });
+  }, [students]);
+
+  const displayedStudents = useMemo(() => {
+    if (!studentSearchTerm.trim()) return sortedStudents;
+    const q = studentSearchTerm.toLowerCase();
+    return sortedStudents.filter(
+      (s) =>
+        s.name.toLowerCase().includes(q) ||
+        s.admissionNumber.toLowerCase().includes(q) ||
+        s.course.toLowerCase().includes(q) ||
+        (s.department && s.department.toLowerCase().includes(q))
+    );
+  }, [sortedStudents, studentSearchTerm]);
 
   // Point Rule Modal State
   const [showPointRuleModal, setShowPointRuleModal] = useState<boolean>(false);
@@ -1327,7 +1351,27 @@ export const AdminPanel: React.FC = () => {
                 <p className="text-xs text-slate-500 mt-1">Enroll, edit profiles, toggle account active status, and generate dossiers.</p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
+                {/* Search Filter */}
+                <div className="flex items-center bg-white border border-slate-200 rounded-xl px-3 py-2 w-64 shadow-2xs">
+                  <Search className="w-3.5 h-3.5 text-slate-400 mr-2 shrink-0" />
+                  <input
+                    type="text"
+                    placeholder="Search by name, ID, course..."
+                    className="bg-transparent border-none outline-none text-xs w-full text-slate-800 placeholder:text-slate-400"
+                    value={studentSearchTerm}
+                    onChange={(e) => setStudentSearchTerm(e.target.value)}
+                  />
+                  {studentSearchTerm && (
+                    <button
+                      onClick={() => setStudentSearchTerm('')}
+                      className="text-slate-400 hover:text-slate-600 ml-1 cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
                 <button
                   id="admin-add-student-btn"
                   onClick={() => {
@@ -1343,7 +1387,7 @@ export const AdminPanel: React.FC = () => {
                     setStudentFormBio('');
                     setShowStudentModal(true);
                   }}
-                  className="px-4 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold shadow-xs flex items-center gap-2 cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold shadow-xs flex items-center gap-2 cursor-pointer shrink-0"
                 >
                   <Plus className="w-4 h-4" />
                   Add New Student
@@ -1354,48 +1398,50 @@ export const AdminPanel: React.FC = () => {
             {/* Students Table */}
             <div className="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
+                <table className="w-full text-left text-xs min-w-[950px] table-fixed">
                   <thead className="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-200">
                     <tr>
-                      <th className="py-3 px-4">Student</th>
-                      <th className="py-3 px-4">Admission No</th>
-                      <th className="py-3 px-4">Course & Department</th>
-                      <th className="py-3 px-4">Batch</th>
-                      <th className="py-3 px-4">Total Points</th>
-                      <th className="py-3 px-4">Rank</th>
-                      <th className="py-3 px-4">Status</th>
-                      <th className="py-3 px-4 text-right">Actions</th>
+                      <th className="py-3 px-4 w-[280px]">Student</th>
+                      <th className="py-3 px-4 w-[140px] whitespace-nowrap">Admission No</th>
+                      <th className="py-3 px-4 w-[220px]">Course & Department</th>
+                      <th className="py-3 px-4 w-[100px] whitespace-nowrap">Batch</th>
+                      <th className="py-3 px-4 w-[110px] whitespace-nowrap">Total Points</th>
+                      <th className="py-3 px-4 w-[80px] whitespace-nowrap">Rank</th>
+                      <th className="py-3 px-4 w-[110px] whitespace-nowrap">Status</th>
+                      <th className="py-3 px-4 w-[130px] whitespace-nowrap text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {students.map((std) => (
-                      <tr key={std.id} className="hover:bg-slate-50/70">
-                        <td className="py-3.5 px-4 flex items-center gap-3">
-                          <img
-                            src={std.avatarUrl}
-                            alt={std.name}
-                            className="w-9 h-9 rounded-full object-cover border border-slate-200"
-                          />
-                          <div>
-                            <span className="font-bold text-slate-900 block">{std.name}</span>
-                            <span className="text-[11px] text-slate-400">{std.email}</span>
-                            {std.address && (
-                              <span className="text-[10px] text-amber-700 font-medium flex items-center gap-1 mt-0.5">
-                                <MapPin className="w-2.5 h-2.5 text-rose-500 shrink-0" />
-                                <span>{std.address}</span>
-                              </span>
-                            )}
+                    {displayedStudents.map((std) => (
+                      <tr key={std.id} className="hover:bg-slate-50/70 transition-colors">
+                        <td className="py-3.5 px-4">
+                          <div className="flex items-center gap-3 min-w-[220px]">
+                            <img
+                              src={std.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80'}
+                              alt={std.name}
+                              className="w-9 h-9 rounded-full object-cover border border-slate-200 shrink-0"
+                            />
+                            <div className="min-w-0 flex-1">
+                              <span className="font-bold text-slate-900 block truncate">{std.name}</span>
+                              <span className="text-[11px] text-slate-400 block truncate">{std.email}</span>
+                              {std.address && (
+                                <span className="text-[10px] text-amber-700 font-medium flex items-center gap-1 mt-0.5 truncate">
+                                  <MapPin className="w-2.5 h-2.5 text-rose-500 shrink-0" />
+                                  <span className="truncate">{std.address}</span>
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </td>
-                        <td className="py-3.5 px-4 font-mono font-bold text-slate-700">{std.admissionNumber}</td>
+                        <td className="py-3.5 px-4 font-mono font-bold text-slate-700 whitespace-nowrap">{std.admissionNumber}</td>
                         <td className="py-3.5 px-4 text-slate-600">
-                          <div>{std.course}</div>
-                          <div className="text-[10px] text-slate-400">{std.department}</div>
+                          <div className="truncate font-medium">{std.course}</div>
+                          <div className="text-[10px] text-slate-400 truncate">{std.department}</div>
                         </td>
-                        <td className="py-3.5 px-4 text-slate-600">{std.batch}</td>
-                        <td className="py-3.5 px-4 font-black text-blue-700">{std.totalPoints} pts</td>
-                        <td className="py-3.5 px-4 font-black text-amber-600">#{std.rank || '-'}</td>
-                        <td className="py-3.5 px-4">
+                        <td className="py-3.5 px-4 text-slate-600 whitespace-nowrap">{std.batch}</td>
+                        <td className="py-3.5 px-4 font-black text-blue-700 whitespace-nowrap">{std.totalPoints} pts</td>
+                        <td className="py-3.5 px-4 font-black text-amber-600 whitespace-nowrap">#{std.rank || '-'}</td>
+                        <td className="py-3.5 px-4 whitespace-nowrap">
                           <button
                             onClick={() => toggleStudentStatus(std.id)}
                             className={`px-2 py-0.5 rounded-md text-[10px] font-bold cursor-pointer ${
@@ -1405,7 +1451,7 @@ export const AdminPanel: React.FC = () => {
                             {std.isActive ? 'ACTIVE' : 'DEACTIVATED'}
                           </button>
                         </td>
-                        <td className="py-3.5 px-4 text-right">
+                        <td className="py-3.5 px-4 text-right whitespace-nowrap">
                           <div className="flex items-center justify-end gap-1.5">
                             <button
                               onClick={() => {
@@ -1421,7 +1467,7 @@ export const AdminPanel: React.FC = () => {
                                 setStudentFormBio(std.bio || '');
                                 setShowStudentModal(true);
                               }}
-                              className="p-1.5 rounded-lg text-slate-600 hover:text-blue-700 hover:bg-blue-50 cursor-pointer"
+                              className="p-1.5 rounded-lg text-slate-600 hover:text-blue-700 hover:bg-blue-50 cursor-pointer transition-colors"
                               title="Edit Student"
                             >
                               <Edit className="w-3.5 h-3.5" />
@@ -1436,14 +1482,14 @@ export const AdminPanel: React.FC = () => {
                                   settings.logoUrl
                                 )
                               }
-                              className="p-1.5 rounded-lg text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 cursor-pointer"
+                              className="p-1.5 rounded-lg text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 cursor-pointer transition-colors"
                               title="Generate Student Dossier PDF"
                             >
                               <FileText className="w-3.5 h-3.5" />
                             </button>
                             <button
                               onClick={() => deleteStudent(std.id)}
-                              className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 cursor-pointer"
+                              className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 cursor-pointer transition-colors"
                               title="Delete Student"
                             >
                               <Trash2 className="w-3.5 h-3.5" />

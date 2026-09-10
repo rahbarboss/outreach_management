@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { useApp } from '../context/AppContext';
 import { ActivityCategory } from '../types';
 import { Calendar, ChevronLeft, Award, FileText, Star, Trophy } from 'lucide-react';

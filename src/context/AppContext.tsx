@@ -181,7 +181,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return () => window.removeEventListener('hashchange', handleHash);
   }, []);
 
-  // Recalculate student points and ranks
+  // Recalculate student points and ranks with stable tie-breaking and safe state updates
   const syncStudentPointsAndRanks = useCallback(
     async (currentSubs: ActivitySubmission[], currentStudents: Student[]) => {
       const updated = currentStudents.map((std) => {
@@ -198,24 +198,42 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         };
       });
 
-      // Sort by points descending to assign dynamic campus ranks
-      const sorted = [...updated].sort((a, b) => b.totalPoints - a.totalPoints);
+      // Sort by points descending to assign dynamic campus ranks with stable tie-breaker
+      const sorted = [...updated].sort((a, b) => {
+        if (b.totalPoints !== a.totalPoints) {
+          return b.totalPoints - a.totalPoints;
+        }
+        return a.admissionNumber.localeCompare(b.admissionNumber);
+      });
+
       const withRanks = sorted.map((std, idx) => ({
         ...std,
         rank: idx + 1,
       }));
 
-      // Sort back to preserve state or keep sorted
       setStudents(withRanks);
       await putManyInStore(STORES.STUDENTS, withRanks);
 
-      // Also update currentStudent if logged in
-      if (currentStudent) {
-        const me = withRanks.find((s) => s.id === currentStudent.id);
-        if (me) setCurrentStudent(me);
-      }
+      // Also update currentStudent safely without causing dependency churn or infinite loop
+      setCurrentStudent((prev) => {
+        if (!prev) return null;
+        const me = withRanks.find((s) => s.id === prev.id);
+        if (!me) return prev;
+        if (
+          prev.totalPoints === me.totalPoints &&
+          prev.rank === me.rank &&
+          prev.approvedCount === me.approvedCount &&
+          prev.pendingCount === me.pendingCount &&
+          prev.name === me.name &&
+          prev.avatarUrl === me.avatarUrl &&
+          prev.isActive === me.isActive
+        ) {
+          return prev;
+        }
+        return me;
+      });
     },
-    [currentStudent]
+    []
   );
 
   // Initial Load from IndexedDB or seed with initial demo data
@@ -337,7 +355,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
 
     loadData();
-  }, [syncStudentPointsAndRanks]);
+  }, []);
 
   // Handle Logo 4-Clicks trigger for Secret Admin Login
   const triggerLogoClick = () => {

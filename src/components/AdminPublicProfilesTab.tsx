@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Student, ActivitySubmission, AchievementBadge, FeaturedStudentTitle } from '../types';
 import { Search, Edit, X, Save, Check, Globe, EyeOff, Camera, Award } from 'lucide-react';
 
@@ -19,7 +19,16 @@ export const AdminPublicProfilesTab: React.FC<Props> = ({ students, updateStuden
   const [avatarUrl, setAvatarUrl] = useState('');
   const [isPublic, setIsPublic] = useState(false);
 
-  const filteredStudents = students.filter(
+  const sortedStudents = useMemo(() => {
+    return [...students].sort((a, b) => {
+      const rankA = a.rank ?? 9999;
+      const rankB = b.rank ?? 9999;
+      if (rankA !== rankB) return rankA - rankB;
+      return a.admissionNumber.localeCompare(b.admissionNumber);
+    });
+  }, [students]);
+
+  const filteredStudents = sortedStudents.filter(
     (s) =>
       s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       s.admissionNumber.toLowerCase().includes(searchTerm.toLowerCase())
@@ -68,10 +77,10 @@ export const AdminPublicProfilesTab: React.FC<Props> = ({ students, updateStuden
         <AnimatePresence>
           {filteredStudents.map((student) => (
             <motion.div
-              layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.18 }}
               key={student.id}
               className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden"
             >
