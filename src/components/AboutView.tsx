@@ -49,7 +49,7 @@ export const AboutView: React.FC = () => {
           About Darul Huda Islamic University
         </h1>
         <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-          Students Outreach Management Software
+          Students Outreach Dashboard
         </p>
       </motion.div>
 
@@ -152,7 +152,7 @@ export const AboutView: React.FC = () => {
                 Institutional Outreach & Merit Mandate
               </h2>
               <p className="text-xs sm:text-sm text-slate-300 max-w-3xl leading-relaxed">
-                The Students Outreach Management Software (SOMS) serves as the primary system of record for collegiate accomplishments. By democratizing merit tracking, every scholar's innovation is immortalized in the institutional memory.
+                The Students Outreach Dashboard serves as the primary system of record for collegiate accomplishments. By democratizing merit tracking, every scholar's innovation is immortalized in the institutional memory.
               </p>
             </div>
 

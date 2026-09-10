@@ -27,7 +27,7 @@ export const Footer: React.FC = () => {
               </div>
               <div>
                 <h3 className="text-lg font-bold text-white tracking-tight">Darul Huda Islamic University</h3>
-                <p className="text-xs text-slate-400 font-medium">Students Outreach Management Software</p>
+                <p className="text-xs text-slate-400 font-medium">Students Outreach Dashboard</p>
               </div>
             </div>
             <p className="text-sm text-slate-400 leading-relaxed max-w-md">
@@ -110,7 +110,7 @@ export const Footer: React.FC = () => {
         <div className="mt-12 pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
           <p>© {new Date().getFullYear()} Darul Huda Islamic University. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <span>Students Outreach Management Software (SOMS)</span>
+            <span>Students Outreach Dashboard</span>
             <span>Tamper-Proof QR Verification</span>
           </div>
         </div>

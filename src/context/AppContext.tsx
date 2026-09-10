@@ -288,7 +288,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           setNotifications(loadedNotifs);
           setAuditLogs(loadedAudit);
           if (loadedSettings.length > 0) {
-            setSettings({ ...INITIAL_SETTINGS, ...loadedSettings[0] });
+            const current = loadedSettings[0];
+            const updated: AppSettings = {
+              ...INITIAL_SETTINGS,
+              ...current,
+              heroHeadingPrefix:
+                !current.heroHeadingPrefix || current.heroHeadingPrefix === 'Students Outreach Management'
+                  ? 'Students Outreach'
+                  : current.heroHeadingPrefix,
+              heroHeadingHighlight:
+                !current.heroHeadingHighlight || current.heroHeadingHighlight === 'Software'
+                  ? 'Dashboard'
+                  : current.heroHeadingHighlight,
+              tagline: current.tagline?.includes('Management Software')
+                ? current.tagline.replace('Management Software', 'Dashboard')
+                : (current.tagline || INITIAL_SETTINGS.tagline),
+            };
+            setSettings(updated);
+            await putInStore(STORES.SETTINGS, { ...updated, id: 'main_settings' });
           }
 
           // Ensure student points and ranks stay strictly synchronized

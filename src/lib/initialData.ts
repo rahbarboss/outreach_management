@@ -19,7 +19,7 @@ import {
 
 export const INITIAL_SETTINGS: AppSettings = {
   organizationName: 'Darul Huda Islamic University',
-  tagline: 'Students Outreach & Academic Achievement Management Software',
+  tagline: 'Students Outreach & Academic Achievement Dashboard',
   logoUrl: '',
   address: 'Academic Enclave, University Avenue, Knowledge Park, Metro City',
   phone: '+1 (800) 456-7890',
@@ -36,8 +36,8 @@ export const INITIAL_SETTINGS: AppSettings = {
   adminPasswordHash: 'admin123',
   // Front Page Hero Defaults
   heroBadgeText: 'Celebrating Student Excellence & Institutional Outreach',
-  heroHeadingPrefix: 'Students Outreach Management',
-  heroHeadingHighlight: 'Software',
+  heroHeadingPrefix: 'Students Outreach',
+  heroHeadingHighlight: 'Dashboard',
   heroDescription: 'A comprehensive academic platform honouring student achievements, literary publications, research symposiums, collegiate programs, competitions, and merit rankings.',
   heroPrimaryBtnText: 'Explore Achievements',
   heroSecondaryBtnText: 'Student Login',

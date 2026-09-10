@@ -125,8 +125,20 @@ export const AdminPanel: React.FC = () => {
   const [heroBadgeText, setHeroBadgeText] = useState(
     settings.heroBadgeText ?? 'Celebrating Student Excellence & Institutional Outreach'
   );
-  const [heroHeadingPrefix, setHeroHeadingPrefix] = useState(settings.heroHeadingPrefix ?? 'Celebrating Student');
-  const [heroHeadingHighlight, setHeroHeadingHighlight] = useState(settings.heroHeadingHighlight ?? 'Excellence');
+  const [heroHeadingPrefix, setHeroHeadingPrefix] = useState(
+    settings.heroHeadingPrefix &&
+    settings.heroHeadingPrefix !== 'Celebrating Student' &&
+    settings.heroHeadingPrefix !== 'Students Outreach Management'
+      ? settings.heroHeadingPrefix
+      : 'Students Outreach'
+  );
+  const [heroHeadingHighlight, setHeroHeadingHighlight] = useState(
+    settings.heroHeadingHighlight &&
+    settings.heroHeadingHighlight !== 'Excellence' &&
+    settings.heroHeadingHighlight !== 'Software'
+      ? settings.heroHeadingHighlight
+      : 'Dashboard'
+  );
   const [heroDescription, setHeroDescription] = useState(
     settings.heroDescription ??
       'A comprehensive academic platform honouring student achievements, literary publications, research symposiums, collegiate programs, competitions, and merit rankings.'
@@ -188,8 +200,8 @@ export const AdminPanel: React.FC = () => {
     if (!window.confirm('Reset the Front Page Hero to original default text?')) return;
     const defaults = {
       heroBadgeText: 'Celebrating Student Excellence & Institutional Outreach',
-      heroHeadingPrefix: 'Celebrating Student',
-      heroHeadingHighlight: 'Excellence',
+      heroHeadingPrefix: 'Students Outreach',
+      heroHeadingHighlight: 'Dashboard',
       heroDescription:
         'A comprehensive academic platform honouring student achievements, literary publications, research symposiums, collegiate programs, competitions, and merit rankings.',
       heroPrimaryBtnText: 'Explore Achievements',
@@ -860,9 +872,9 @@ export const AdminPanel: React.FC = () => {
 
                   {/* Main Headline Preview */}
                   <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight">
-                    {heroHeadingPrefix || 'Celebrating Student'}{' '}
+                    {heroHeadingPrefix || 'Students Outreach'}{' '}
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-amber-200 to-indigo-300 font-black">
-                      {heroHeadingHighlight || 'Excellence'}
+                      {heroHeadingHighlight || 'Dashboard'}
                     </span>
                   </h2>
 
@@ -948,7 +960,7 @@ export const AdminPanel: React.FC = () => {
                       type="text"
                       value={heroHeadingPrefix}
                       onChange={(e) => setHeroHeadingPrefix(e.target.value)}
-                      placeholder="e.g. Celebrating Student"
+                      placeholder="e.g. Students Outreach"
                       className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium"
                     />
                     <p className="text-[11px] text-slate-400">Rendered in high-contrast solid white display typography.</p>
@@ -962,7 +974,7 @@ export const AdminPanel: React.FC = () => {
                       type="text"
                       value={heroHeadingHighlight}
                       onChange={(e) => setHeroHeadingHighlight(e.target.value)}
-                      placeholder="e.g. Excellence"
+                      placeholder="e.g. Dashboard"
                       className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 font-bold"
                     />
                     <p className="text-[11px] text-slate-400">

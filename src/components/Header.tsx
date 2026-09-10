@@ -96,7 +96,7 @@ export const Header: React.FC = () => {
                 Darul Huda Islamic University
               </span>
               <span className="text-xs text-slate-500 font-medium tracking-wide">
-                Students Outreach Management Software
+                Students Outreach Dashboard
               </span>
             </div>
           </motion.div>

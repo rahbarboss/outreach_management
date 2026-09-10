@@ -32,7 +32,7 @@ const MainLayout: React.FC = () => {
           </div>
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
             <span className="w-2 h-2 rounded-full bg-blue-600 animate-ping"></span>
-            Initializing Students Outreach Management Software...
+            Initializing Students Outreach Dashboard...
           </div>
         </div>
       </div>
