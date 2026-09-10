@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useId } from 'react';
+import React, { useState, useEffect, useId } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useApp } from '../context/AppContext';
 import { Student } from '../types';
 import { fileToBase64 } from '../lib/db';
+import { fireScholarCelebration, fireConfetti } from '../lib/confetti';
 import {
   GraduationCap,
   X,
@@ -32,6 +33,7 @@ import {
   Phone,
   ShieldCheck,
   Eye,
+  PartyPopper,
 } from 'lucide-react';
 
 const SCHOLAR_PRESET_AVATARS = [
@@ -138,6 +140,13 @@ export const StudentLoginModal: React.FC = () => {
     resetCreateForm();
     setMode('create');
   };
+
+  // Trigger celebration confetti whenever a student profile is created successfully
+  useEffect(() => {
+    if (mode === 'created_success' && createdStudent) {
+      fireScholarCelebration();
+    }
+  }, [mode, createdStudent]);
 
   if (!showStudentLoginModal) return null;
 
@@ -268,6 +277,7 @@ export const StudentLoginModal: React.FC = () => {
       const result = await addStudent(studentPayload);
       setCreatedStudent(result);
       setMode('created_success');
+      fireScholarCelebration();
     } catch (err: any) {
       setErrorMsg(err.message || 'Failed to create new student profile.');
     } finally {
@@ -288,6 +298,7 @@ export const StudentLoginModal: React.FC = () => {
       setShowStudentLoginModal(false);
       setMode('list');
       setCreatedStudent(null);
+      fireConfetti();
     }
   };
 
@@ -1030,6 +1041,15 @@ export const StudentLoginModal: React.FC = () => {
                           Active Scholar
                         </span>
                         <span className="text-[11px] text-blue-200">Darul Huda</span>
+                        <button
+                          type="button"
+                          onClick={() => fireScholarCelebration()}
+                          className="ml-auto px-2.5 py-0.5 rounded-full bg-amber-400/20 hover:bg-amber-400/30 border border-amber-300/40 text-amber-300 text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-all active:scale-95 shadow-xs"
+                          title="Click to celebrate with confetti!"
+                        >
+                          <PartyPopper className="w-3 h-3 text-amber-300 animate-bounce" />
+                          <span>Confetti 🎉</span>
+                        </button>
                       </div>
                       <h4 className="text-lg font-black text-white truncate">{createdStudent.name}</h4>
                       <p className="text-xs text-blue-200 font-medium truncate">{createdStudent.course}</p>

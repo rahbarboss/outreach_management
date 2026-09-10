@@ -42,6 +42,12 @@ import {
   INITIAL_NOTIFICATIONS,
   INITIAL_ANNOUNCEMENTS,
 } from '../lib/initialData';
+import {
+  fireScholarCelebration,
+  fireAchievementCelebration,
+  fireCertificateCelebration,
+  fireConfetti,
+} from '../lib/confetti';
 
 interface ToastState {
   message: string;
@@ -600,6 +606,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     await syncStudentPointsAndRanks(nextSubs, students);
     showToast(isDraft ? 'Draft saved locally.' : 'Activity submitted for Admin verification.', 'success');
+    if (!isDraft) {
+      fireAchievementCelebration();
+    }
     return newSub;
   };
 
@@ -691,6 +700,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     await syncStudentPointsAndRanks(nextSubs, students);
     showToast(`Submission approved with ${awardedPoints} points!`, 'success');
+    fireAchievementCelebration();
   };
 
   const rejectActivity = async (id: string, reason: string) => {
@@ -817,6 +827,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     await putInStore(STORES.STUDENTS, newStudent);
     await logAudit('ADD_STUDENT', `Enrolled new student ${newStudent.name} (${newStudent.admissionNumber})`, 'student', newStudent.id);
     showToast(`Student ${newStudent.name} added successfully.`, 'success');
+    fireScholarCelebration();
     return newStudent;
   };
 
@@ -971,6 +982,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setBadges(next);
     await putInStore(STORES.BADGES, badge);
     showToast('Badge updated.', 'success');
+    fireConfetti();
   };
 
   const deleteBadge = async (id: string) => {
@@ -1013,6 +1025,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     await logAudit('ISSUE_CERTIFICATE', `Issued certificate ${certId} to ${newCert.studentName} for "${newCert.activityTitle}"`);
     showToast(`Certificate ${certId} issued with QR verification code!`, 'success');
+    fireCertificateCelebration();
     return newCert;
   };
 
@@ -1040,6 +1053,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setAnnouncements(nextAnnouncements.sort((a, b) => a.displayOrder - b.displayOrder));
     await putInStore(STORES.ANNOUNCEMENTS, announcement);
     showToast('Announcement saved.', 'success');
+    fireConfetti();
   };
 
   const deleteAnnouncement = async (id: string) => {

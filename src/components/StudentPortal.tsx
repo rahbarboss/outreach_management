@@ -9,6 +9,7 @@ import { ActivitySubmission, ActivityCategory, SubmissionStatus } from '../types
 import { exportStudentReportPDF, exportCertificatePDF } from '../lib/pdfExport';
 import { exportStudentDataExcel } from '../lib/excelExport';
 import { fileToBase64 } from '../lib/db';
+import { fireCertificateCelebration } from '../lib/confetti';
 import {
   GraduationCap,
   Trophy,
@@ -1196,7 +1197,10 @@ export const StudentPortal: React.FC = () => {
                       </button>
 
                       <button
-                        onClick={() => exportCertificatePDF(cert, settings.organizationName, settings.logoUrl)}
+                        onClick={() => {
+                          exportCertificatePDF(cert, settings.organizationName, settings.logoUrl);
+                          fireCertificateCelebration();
+                        }}
                         className="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
                         title="Download Certificate PDF"
                       >
