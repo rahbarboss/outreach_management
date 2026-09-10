@@ -87,7 +87,7 @@ interface AppContextType {
   showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
 
   // Auth
-  loginAsStudent: (admissionNumber: string) => boolean;
+  loginAsStudent: (admissionNumber: string, directStudent?: Student) => boolean;
   loginAsAdmin: (user: string, pass: string) => boolean;
   logout: () => void;
 
@@ -374,11 +374,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Auth: Student Login by Admission Number
-  const loginAsStudent = (admissionNumber: string): boolean => {
+  const loginAsStudent = (admissionNumber: string, directStudent?: Student): boolean => {
     const cleanNo = admissionNumber.trim().toUpperCase();
-    const found = students.find(
-      (s) => s.admissionNumber.trim().toUpperCase() === cleanNo && s.isActive
-    );
+    const found =
+      directStudent ||
+      students.find(
+        (s) => s.admissionNumber.trim().toUpperCase() === cleanNo && s.isActive
+      );
 
     if (found) {
       setUserRole('student');
