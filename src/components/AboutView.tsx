@@ -46,10 +46,10 @@ export const AboutView: React.FC = () => {
           <span>Institutional Accreditation & Quality Assurance</span>
         </div>
         <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-          About {settings.organizationName}
+          About Darul Huda Islamic University
         </h1>
         <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-          {settings.tagline}
+          Students Outreach Management Software
         </p>
       </motion.div>
 

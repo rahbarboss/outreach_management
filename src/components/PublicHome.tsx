@@ -333,7 +333,7 @@ export const PublicHome: React.FC = () => {
               transition={{ duration: 0.7, delay: 0.1 }}
               className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight"
             >
-              {settings.heroHeadingPrefix !== undefined ? settings.heroHeadingPrefix : 'Celebrating Student'}{' '}
+              Students Outreach Management{' '}
               <motion.span
                 animate={{
                   backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
@@ -341,7 +341,7 @@ export const PublicHome: React.FC = () => {
                 transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
                 className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-amber-200 to-indigo-300 bg-[length:200%_auto]"
               >
-                {settings.heroHeadingHighlight !== undefined ? settings.heroHeadingHighlight : 'Excellence'}
+                Software
               </motion.span>
             </motion.h1>
 

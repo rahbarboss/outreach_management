@@ -93,10 +93,10 @@ export const Header: React.FC = () => {
 
             <div className="flex flex-col">
               <span className="text-lg font-extrabold tracking-tight text-slate-900 leading-tight group-hover:text-blue-700 transition-colors">
-                {settings.organizationName}
+                Darul Huda Islamic University
               </span>
               <span className="text-xs text-slate-500 font-medium tracking-wide">
-                {settings.tagline || 'Students Outreach Management Software'}
+                Students Outreach Management Software
               </span>
             </div>
           </motion.div>
