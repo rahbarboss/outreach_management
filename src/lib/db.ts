@@ -73,22 +73,120 @@ export async function openDB(): Promise<IDBDatabase> {
   });
 }
 
-// Fallback for environments where IndexedDB might be blocked
-function getLocalFallback<T>(storeName: string): T[] {
+// Fallback in-memory cache to guarantee zero runtime failures even in restricted sandboxes
+const memoryStore = new Map<string, any[]>();
+
+// Heavy stores that should never be stored in localStorage due to 5MB browser quota limitations
+const HEAVY_STORES: readonly string[] = [
+  STORES.SUBMISSIONS,
+  STORES.CERTIFICATES,
+  STORES.AUDIT_LOGS,
+  STORES.POINT_HISTORY,
+  STORES.STUDENTS,
+];
+
+/**
+ * Prunes heavy or redundant soms_ entries from localStorage to prevent quota exhaustion
+ */
+export function pruneHeavyLocalStorage(): void {
   try {
-    const raw = localStorage.getItem(`soms_${storeName}`);
-    return raw ? JSON.parse(raw) : [];
-  } catch (err) {
-    console.error('LocalStorage get error', err);
-    return [];
+    if (typeof window === 'undefined' || !window.localStorage) return;
+    for (const heavy of HEAVY_STORES) {
+      try {
+        localStorage.removeItem(`soms_${heavy}`);
+      } catch {
+        // ignore
+      }
+    }
+  } catch {
+    // ignore
   }
 }
 
-function setLocalFallback<T>(storeName: string, items: T[]): void {
+// Automatically prune redundant heavy keys on initial load
+pruneHeavyLocalStorage();
+
+/**
+ * Creates a quota-safe clone of data for localStorage backup.
+ * Strips huge base64 strings (> 40KB) from the fallback copy so it never exhausts quota.
+ */
+function sanitizeForLocalStorage<T>(items: T[]): T[] {
   try {
-    localStorage.setItem(`soms_${storeName}`, JSON.stringify(items));
+    return items.map((item) => {
+      if (!item || typeof item !== 'object') return item;
+      const copy: Record<string, any> = { ...item };
+      for (const key of Object.keys(copy)) {
+        const val = copy[key];
+        if (typeof val === 'string' && val.startsWith('data:') && val.length > 40000) {
+          // Truncate or omit excessive base64 in local backup (IndexedDB holds the original intact)
+          copy[key] = '';
+        }
+      }
+      return copy as T;
+    });
+  } catch {
+    return items;
+  }
+}
+
+// Fallback for environments where IndexedDB might be blocked or unavailable
+function getLocalFallback<T>(storeName: string): T[] {
+  if (memoryStore.has(storeName)) {
+    return (memoryStore.get(storeName) as T[]) || [];
+  }
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) return [];
+    const raw = localStorage.getItem(`soms_${storeName}`);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      memoryStore.set(storeName, parsed);
+      return parsed;
+    }
   } catch (err) {
-    console.error('LocalStorage set error', err);
+    console.warn(`LocalStorage get failed for ${storeName}:`, err);
+  }
+  return [];
+}
+
+function setLocalFallback<T>(storeName: string, items: T[]): void {
+  // Always update in-memory cache first
+  memoryStore.set(storeName, items);
+
+  // Skip writing heavy stores to localStorage to protect the 5MB browser quota
+  if (HEAVY_STORES.includes(storeName)) {
+    try {
+      localStorage.removeItem(`soms_${storeName}`);
+    } catch {
+      // ignore
+    }
+    return;
+  }
+
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) return;
+    const sanitized = sanitizeForLocalStorage(items);
+    localStorage.setItem(`soms_${storeName}`, JSON.stringify(sanitized));
+  } catch (err: any) {
+    // If quota is exceeded, clear all heavy keys and try once more
+    const isQuota =
+      err &&
+      (err.name === 'QuotaExceededError' ||
+        err.name === 'NS_ERROR_DOM_QUOTA_REACHED' ||
+        err.code === 22 ||
+        err.number === -2147024882);
+
+    if (isQuota) {
+      try {
+        pruneHeavyLocalStorage();
+        const sanitized = sanitizeForLocalStorage(items);
+        localStorage.setItem(`soms_${storeName}`, JSON.stringify(sanitized));
+      } catch {
+        // Handled gracefully in memoryStore - no console.error to avoid error prompts
+        console.warn(`[Storage] Saved soms_${storeName} to memory cache (localStorage quota full)`);
+      }
+    } else {
+      console.warn(`[Storage] LocalStorage unavailable for soms_${storeName}:`, err);
+    }
   }
 }
 
@@ -97,22 +195,24 @@ export async function getAllFromStore<T>(storeName: StoreName): Promise<T[]> {
     const db = await openDB();
     if (!db) return getLocalFallback<T>(storeName);
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const transaction = db.transaction(storeName, 'readonly');
       const store = transaction.objectStore(storeName);
       const request = store.getAll();
 
       request.onsuccess = () => {
-        resolve(request.result as T[]);
+        const result = (request.result as T[]) || [];
+        memoryStore.set(storeName, result);
+        resolve(result);
       };
 
       request.onerror = () => {
-        console.warn(`IndexedDB getAll failed for ${storeName}, falling back to localStorage`);
+        console.warn(`IndexedDB getAll failed for ${storeName}, falling back to memory/local`);
         resolve(getLocalFallback<T>(storeName));
       };
     });
   } catch (err) {
-    console.error(`Error in getAllFromStore(${storeName}):`, err);
+    console.warn(`Error in getAllFromStore(${storeName}), falling back:`, err);
     return getLocalFallback<T>(storeName);
   }
 }
@@ -138,12 +238,18 @@ export async function putInStore<T extends { id: string }>(
       const request = store.put(item);
 
       request.onsuccess = () => {
-        // Also keep localStorage updated for backup
+        // Keep in-memory store updated
         const items = getLocalFallback<T>(storeName);
         const index = items.findIndex((i) => i.id === item.id);
         if (index >= 0) items[index] = item;
         else items.push(item);
-        setLocalFallback(storeName, items);
+        memoryStore.set(storeName, items);
+
+        // Only persist lightweight stores (like settings) to localStorage backup
+        if (storeName === STORES.SETTINGS) {
+          setLocalFallback(storeName, items);
+        }
+
         resolve(item);
       };
 
@@ -176,7 +282,11 @@ export async function putManyInStore<T extends { id: string }>(
       items.forEach((item) => store.put(item));
 
       transaction.oncomplete = () => {
-        setLocalFallback(storeName, items);
+        memoryStore.set(storeName, items);
+        // Only backup lightweight non-heavy stores to localStorage
+        if (!HEAVY_STORES.includes(storeName)) {
+          setLocalFallback(storeName, items);
+        }
         resolve();
       };
 
@@ -207,7 +317,10 @@ export async function deleteFromStore(storeName: StoreName, id: string): Promise
 
       request.onsuccess = () => {
         const items = getLocalFallback<{ id: string }>(storeName).filter((i) => i.id !== id);
-        setLocalFallback(storeName, items);
+        memoryStore.set(storeName, items);
+        if (storeName === STORES.SETTINGS) {
+          setLocalFallback(storeName, items);
+        }
         resolve();
       };
 
@@ -248,13 +361,66 @@ export async function clearEntireStore(storeName: StoreName): Promise<void> {
 }
 
 /**
- * Utility to convert an uploaded file into a persistent base64 data string
+ * Utility to convert an uploaded file into a persistent base64 data string.
+ * If the file is an image, it automatically compresses and bounds dimensions to 1280px
+ * to prevent multi-megabyte payloads from causing memory or quota bottlenecks.
  */
 export function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
+    // If not an image (e.g. PDF or document), read standard data URL
+    if (!file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+      return;
+    }
+
+    // For images, optimize with canvas compression to keep files compact (< 250KB)
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
+    reader.onload = (e) => {
+      const rawDataUrl = e.target?.result as string;
+      if (!rawDataUrl) {
+        resolve('');
+        return;
+      }
+
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const maxDim = 1280;
+          let { width, height } = img;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            resolve(rawDataUrl);
+            return;
+          }
+
+          ctx.drawImage(img, 0, 0, width, height);
+          const mime = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+          const compressed = canvas.toDataURL(mime, 0.85);
+          resolve(compressed);
+        } catch {
+          resolve(rawDataUrl);
+        }
+      };
+      img.onerror = () => resolve(rawDataUrl);
+      img.src = rawDataUrl;
+    };
     reader.onerror = (error) => reject(error);
   });
 }

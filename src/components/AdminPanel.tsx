@@ -71,6 +71,7 @@ import {
   Hash,
   Layout,
   GraduationCap,
+  MapPin,
 } from 'lucide-react';
 
 export const AdminPanel: React.FC = () => {
@@ -418,6 +419,7 @@ export const AdminPanel: React.FC = () => {
   const [studentFormName, setStudentFormName] = useState('');
   const [studentFormAdmNo, setStudentFormAdmNo] = useState('');
   const [studentFormEmail, setStudentFormEmail] = useState('');
+  const [studentFormAddress, setStudentFormAddress] = useState('');
   const [studentFormCourse, setStudentFormCourse] = useState('B.A. English Literature');
   const [studentFormDept, setStudentFormDept] = useState('Humanities & Languages');
   const [studentFormBatch, setStudentFormBatch] = useState('2023-2026');
@@ -494,6 +496,7 @@ export const AdminPanel: React.FC = () => {
           name: studentFormName,
           admissionNumber: studentFormAdmNo,
           email: studentFormEmail,
+          address: studentFormAddress.trim(),
           course: studentFormCourse,
           department: studentFormDept,
           batch: studentFormBatch,
@@ -505,10 +508,11 @@ export const AdminPanel: React.FC = () => {
           name: studentFormName,
           admissionNumber: studentFormAdmNo,
           email: studentFormEmail,
+          address: studentFormAddress.trim(),
           course: studentFormCourse,
           department: studentFormDept,
           batch: studentFormBatch,
-          avatarUrl: studentFormAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400',
+          avatarUrl: studentFormAvatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&auto=format&fit=crop&q=80',
           isActive: true,
           bio: studentFormBio,
         });
@@ -1308,6 +1312,7 @@ export const AdminPanel: React.FC = () => {
                     setStudentFormName('');
                     setStudentFormAdmNo(`ADM2026-${String(students.length + 1).padStart(3, '0')}`);
                     setStudentFormEmail('');
+                    setStudentFormAddress('');
                     setStudentFormCourse('B.Tech Computer Science');
                     setStudentFormDept('School of Computing');
                     setStudentFormBatch('2024-2028');
@@ -1351,6 +1356,12 @@ export const AdminPanel: React.FC = () => {
                           <div>
                             <span className="font-bold text-slate-900 block">{std.name}</span>
                             <span className="text-[11px] text-slate-400">{std.email}</span>
+                            {std.address && (
+                              <span className="text-[10px] text-amber-700 font-medium flex items-center gap-1 mt-0.5">
+                                <MapPin className="w-2.5 h-2.5 text-rose-500 shrink-0" />
+                                <span>{std.address}</span>
+                              </span>
+                            )}
                           </div>
                         </td>
                         <td className="py-3.5 px-4 font-mono font-bold text-slate-700">{std.admissionNumber}</td>
@@ -1379,6 +1390,7 @@ export const AdminPanel: React.FC = () => {
                                 setStudentFormName(std.name);
                                 setStudentFormAdmNo(std.admissionNumber);
                                 setStudentFormEmail(std.email);
+                                setStudentFormAddress(std.address || '');
                                 setStudentFormCourse(std.course);
                                 setStudentFormDept(std.department);
                                 setStudentFormBatch(std.batch);
@@ -2844,6 +2856,20 @@ export const AdminPanel: React.FC = () => {
                 </div>
               </div>
 
+              <div className="space-y-1.5">
+                <label className="font-semibold text-slate-700 flex items-center gap-1">
+                  <MapPin className="w-3 h-3 text-rose-500" />
+                  <span>Permanent Address / Location</span>
+                </label>
+                <input
+                  type="text"
+                  value={studentFormAddress}
+                  onChange={(e) => setStudentFormAddress(e.target.value)}
+                  placeholder="e.g. Kishanganj, Bihar"
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300"
+                />
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <label className="font-semibold text-slate-700">Course / Degree</label>
@@ -3263,7 +3289,7 @@ export const AdminPanel: React.FC = () => {
               return (
                 <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center gap-3.5">
                   <img
-                    src={std?.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}
+                    src={std?.avatarUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100'}
                     alt={selectedLedgerItem.studentName}
                     className="w-11 h-11 rounded-full object-cover border-2 border-white shadow-xs shrink-0"
                   />

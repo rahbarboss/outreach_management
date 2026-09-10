@@ -33,6 +33,7 @@ import {
   Presentation,
   FileText,
   Compass,
+  MapPin,
 } from 'lucide-react';
 
 // Dynamic animated number counter component
@@ -170,6 +171,73 @@ export const PublicHome: React.FC = () => {
     { id: 'outside_program', label: 'Outside Programs', icon: Compass },
     { id: 'competition', label: 'Competitions', icon: Trophy },
     { id: 'award', label: 'Awards', icon: Award },
+  ];
+
+  // Rich animated category showcase items for scroll experience
+  const categoryShowcaseItems = [
+    {
+      id: 'publication',
+      title: 'Research & Publications',
+      desc: 'Peer-reviewed international journals, university monographs, research papers, and academic publications.',
+      img: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=800&q=80',
+      color: 'from-blue-600 to-indigo-700',
+      tag: 'Scholarly Research',
+      icon: BookOpen,
+    },
+    {
+      id: 'paper_presentation',
+      title: 'Paper Presentations',
+      desc: 'National & international plenary presentations, keynote discourses, and academic summits.',
+      img: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=800&q=80',
+      color: 'from-violet-600 to-purple-700',
+      tag: 'Conference Talks',
+      icon: FileText,
+    },
+    {
+      id: 'seminar',
+      title: 'Seminars & Workshops',
+      desc: 'Skill symposiums, executive workshops, technical bootcamps, and scientific roundtables.',
+      img: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80',
+      color: 'from-emerald-600 to-teal-700',
+      tag: 'Masterclasses',
+      icon: Users,
+    },
+    {
+      id: 'college_program',
+      title: 'Campus Programs',
+      desc: 'Official institutional delegations, committee lead roles, and department leadership symposiums.',
+      img: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=800&q=80',
+      color: 'from-sky-600 to-blue-700',
+      tag: 'Campus Summits',
+      icon: Building,
+    },
+    {
+      id: 'outside_program',
+      title: 'Inter-University Events',
+      desc: 'State & national external representations, externships, and youth delegation conclaves.',
+      img: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80',
+      color: 'from-cyan-600 to-teal-700',
+      tag: 'National Summits',
+      icon: Compass,
+    },
+    {
+      id: 'competition',
+      title: 'Competitions & Hackathons',
+      desc: 'High-stakes coding sprints, national debate championships, moot courts, and Olympiads.',
+      img: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=800&q=80',
+      color: 'from-amber-600 to-orange-700',
+      tag: 'Campus Arena',
+      icon: Trophy,
+    },
+    {
+      id: 'award',
+      title: 'Awards & Accolades',
+      desc: 'Chancellor medals, presidential merit citations, and university hall of fame honors.',
+      img: 'https://images.unsplash.com/photo-1578269174936-2709b6aeb913?auto=format&fit=crop&w=800&q=80',
+      color: 'from-yellow-500 to-amber-600',
+      tag: 'Honor Roll',
+      icon: Award,
+    },
   ];
 
   const getCategoryCount = (catId: string) => {
@@ -477,10 +545,11 @@ export const PublicHome: React.FC = () => {
             <AnimatePresence mode="wait" custom={direction}>
               {currentFeatured && (() => {
                 const matchedStudent = students.find((s) => s.id === currentFeatured.studentId);
-                const displayAvatar = matchedStudent?.avatarUrl || currentFeatured.studentAvatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400';
+                const displayAvatar = matchedStudent?.avatarUrl || currentFeatured.studentAvatarUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&auto=format&fit=crop&q=80';
                 const displayName = matchedStudent?.name || currentFeatured.studentName;
                 const displayCourse = matchedStudent?.course || currentFeatured.studentCourse;
                 const displayDept = matchedStudent?.department || currentFeatured.studentDepartment;
+                const displayAddress = matchedStudent?.address;
                 const displayBio = matchedStudent?.bio || currentFeatured.shortDescription;
                 const displayPoints = matchedStudent?.totalPoints ?? 140;
                 const displayApproved = matchedStudent?.approvedCount ?? 6;
@@ -584,6 +653,12 @@ export const PublicHome: React.FC = () => {
                           <p className="text-xs text-slate-500 font-semibold mt-0.5">
                             {currentFeatured.positionSubtitle}
                           </p>
+                        )}
+                        {displayAddress && (
+                          <div className="flex items-center gap-1.5 text-xs text-amber-900 font-bold bg-amber-100/90 px-3 py-1 rounded-lg border border-amber-300 w-fit mt-1.5">
+                            <MapPin className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                            <span>Address: {displayAddress}</span>
+                          </div>
                         )}
                       </div>
 
@@ -736,6 +811,126 @@ export const PublicHome: React.FC = () => {
           </motion.div>
         </section>
       )}
+
+      {/* 2.5. DYNAMIC SCROLL ANIMATED CATEGORIES SHOWCASE ("cetegories animated and dynamic hokar aana hai ek dam professinal look dena hai") */}
+      <section id="categories-showcase-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 35 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+          className="text-center max-w-3xl mx-auto mb-10 space-y-3"
+        >
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold uppercase tracking-wider shadow-2xs"
+          >
+            <Layers className="w-3.5 h-3.5 text-blue-600" />
+            <span>Interactive Categories & Activity Streams</span>
+          </motion.div>
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+            Academic & Extracurricular Categories
+          </h2>
+          <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+            Explore diverse streams where students log verified achievements, earn academic honor points, and ascend campus rankings.
+          </p>
+        </motion.div>
+
+        {/* Dynamic Category Cards Grid with 3D Float, Image Zooms & Staggered Scroll Entrance */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
+          {categoryShowcaseItems.map((item, idx) => {
+            const Icon = item.icon;
+            const count = getCategoryCount(item.id);
+            return (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, y: 40, scale: 0.92 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, amount: 0.15 }}
+                transition={{
+                  duration: 0.6,
+                  delay: (idx % 4) * 0.08,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                whileHover={{
+                  y: -8,
+                  scale: 1.025,
+                  transition: { duration: 0.25, ease: 'easeOut' },
+                }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => {
+                  setGalleryCategory(item.id);
+                  const el = document.getElementById('achievement-gallery-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="group relative bg-white rounded-3xl border border-slate-200/90 shadow-2xs hover:shadow-2xl hover:border-blue-500/60 transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
+              >
+                {/* Dynamic Category Image with Scroll Reveal & Hover Scale */}
+                <div className="relative h-44 w-full overflow-hidden bg-slate-900">
+                  <motion.img
+                    src={item.img}
+                    alt={item.title}
+                    initial={{ scale: 1.18, opacity: 0.8 }}
+                    whileInView={{ scale: 1, opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.9, ease: 'easeOut' }}
+                    className="w-full h-full object-cover group-hover:scale-115 group-hover:rotate-1 transition-transform duration-700 ease-out"
+                    loading="lazy"
+                  />
+                  {/* Subtle Gradient & Shimmer Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/35 to-transparent group-hover:from-slate-950/95 transition-colors" />
+                  
+                  {/* Dynamic Glow Line */}
+                  <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${item.color}`} />
+
+                  {/* Top Badge Overlay */}
+                  <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10">
+                    <span className="px-2.5 py-1 rounded-lg bg-white/20 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-wider border border-white/30 shadow-xs">
+                      {item.tag}
+                    </span>
+                    <span className="px-2.5 py-1 rounded-full bg-amber-400 text-slate-950 text-xs font-black shadow-md flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-slate-900" />
+                      {count} Records
+                    </span>
+                  </div>
+
+                  {/* Icon floating on Image bottom-left */}
+                  <div className="absolute bottom-3 left-3 flex items-center gap-2 z-10">
+                    <div className={`w-9 h-9 rounded-xl bg-gradient-to-tr ${item.color} text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
+                      <Icon className="w-4 h-4" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Card Content */}
+                <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
+                  <div>
+                    <h3 className="text-base font-extrabold text-slate-900 group-hover:text-blue-700 transition-colors leading-snug">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-slate-500 line-clamp-2 mt-1.5 leading-relaxed">
+                      {item.desc}
+                    </p>
+                  </div>
+
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-blue-700 group-hover:text-blue-800">
+                    <span className="flex items-center gap-1">
+                      <span>Explore Records</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                    <span className="text-[11px] text-slate-400 font-semibold">
+                      +{count * 20} pts
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </section>
 
       {/* 3. FEATURED PUBLICATIONS & ACHIEVEMENTS HIGHLIGHTS (DYNAMIC & ANIMATED) */}
       {settings.publicPublications && featuredPublications.length > 0 && (
@@ -1095,6 +1290,12 @@ export const PublicHome: React.FC = () => {
                     <div>
                       <h4 className="text-sm font-bold text-white group-hover:text-amber-300 transition-colors">{std.name}</h4>
                       <p className="text-[11px] text-slate-400">{std.course} • {std.department}</p>
+                      {std.address && (
+                        <p className="text-[10px] text-amber-300/90 font-medium flex items-center gap-1 mt-0.5">
+                          <MapPin className="w-2.5 h-2.5 text-rose-400 shrink-0" />
+                          <span>{std.address}</span>
+                        </p>
+                      )}
                     </div>
                   </div>
 

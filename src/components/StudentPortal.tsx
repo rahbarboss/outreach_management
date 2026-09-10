@@ -40,6 +40,7 @@ import {
   X,
   RotateCcw,
   Layers,
+  MapPin,
 } from 'lucide-react';
 
 export const StudentPortal: React.FC = () => {
@@ -80,6 +81,7 @@ export const StudentPortal: React.FC = () => {
   const [editName, setEditName] = useState<string>('');
   const [editPhone, setEditPhone] = useState<string>('');
   const [editEmail, setEditEmail] = useState<string>('');
+  const [editAddress, setEditAddress] = useState<string>('');
   const [editCourse, setEditCourse] = useState<string>('');
   const [editDepartment, setEditDepartment] = useState<string>('');
   const [editBatch, setEditBatch] = useState<string>('');
@@ -272,6 +274,7 @@ export const StudentPortal: React.FC = () => {
     setEditName(currentStudent.name || '');
     setEditPhone(currentStudent.phone || '');
     setEditEmail(currentStudent.email || '');
+    setEditAddress(currentStudent.address || '');
     setEditCourse(currentStudent.course || '');
     setEditDepartment(currentStudent.department || '');
     setEditBatch(currentStudent.batch || '');
@@ -334,6 +337,7 @@ export const StudentPortal: React.FC = () => {
         name: editName.trim(),
         email: editEmail.trim(),
         phone: editPhone.trim(),
+        address: editAddress.trim(),
         course: editCourse.trim(),
         department: editDepartment.trim(),
         batch: editBatch.trim(),
@@ -349,14 +353,18 @@ export const StudentPortal: React.FC = () => {
     }
   };
 
-  // Curated preset scholar avatars for quick selection
+  // Curated preset scholar avatars for quick selection (Muslim boys portraits)
   const PRESET_AVATARS = [
-    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400',
-    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
-    'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400',
-    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
-    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
-    'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400',
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=500&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=500&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=500&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=500&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1522529599102-193c0d76b5b6?w=500&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=500&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=500&auto=format&fit=crop&q=80',
   ];
 
   return (
@@ -423,6 +431,12 @@ export const StudentPortal: React.FC = () => {
               <p className="text-xs text-slate-300">
                 {currentStudent.department} • Batch of {currentStudent.batch}
               </p>
+              {currentStudent.address && (
+                <div className="flex items-center gap-1.5 text-xs text-amber-300 font-semibold bg-white/10 px-2.5 py-1 rounded-lg border border-white/15 w-fit mt-1">
+                  <MapPin className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+                  <span>Address: {currentStudent.address}</span>
+                </div>
+              )}
               {currentStudent.bio && (
                 <p className="text-xs text-amber-200/90 italic line-clamp-1 max-w-lg mt-0.5">
                   "{currentStudent.bio}"
@@ -1460,6 +1474,20 @@ export const StudentPortal: React.FC = () => {
                     value={editEmail}
                     onChange={(e) => setEditEmail(e.target.value)}
                     placeholder="e.g. scholar@institution.edu"
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  />
+                </div>
+
+                <div className="sm:col-span-2 space-y-1">
+                  <label className="font-bold text-slate-800 text-xs flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-rose-500" />
+                    <span>Permanent / Residential Address</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={editAddress}
+                    onChange={(e) => setEditAddress(e.target.value)}
+                    placeholder="e.g. Kishanganj, Bihar"
                     className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600"
                   />
                 </div>

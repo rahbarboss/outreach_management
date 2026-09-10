@@ -31,6 +31,7 @@ import {
   LayoutGrid,
   List,
   Flame,
+  MapPin,
 } from 'lucide-react';
 
 export const LeaderboardView: React.FC = () => {
@@ -262,6 +263,12 @@ export const LeaderboardView: React.FC = () => {
               </h3>
               <p className="text-xs text-blue-700 font-bold mt-0.5">{topThree[1].course}</p>
               <p className="text-[11px] text-slate-400">{topThree[1].department}</p>
+              {topThree[1].address && (
+                <p className="text-[10px] text-amber-700 font-semibold flex items-center gap-1 mt-1">
+                  <MapPin className="w-2.5 h-2.5 text-rose-500 shrink-0" />
+                  <span>{topThree[1].address}</span>
+                </p>
+              )}
 
               <div className="mt-5 pt-4 border-t border-slate-100 w-full flex items-center justify-around">
                 <div>
@@ -318,6 +325,12 @@ export const LeaderboardView: React.FC = () => {
               </h3>
               <p className="text-xs text-blue-700 font-bold mt-0.5">{topThree[0].course}</p>
               <p className="text-[11px] text-slate-400">{topThree[0].department}</p>
+              {topThree[0].address && (
+                <p className="text-xs text-amber-900 font-bold flex items-center gap-1 mt-1 bg-amber-200/80 px-2.5 py-0.5 rounded-full border border-amber-300">
+                  <MapPin className="w-3 h-3 text-rose-600 shrink-0" />
+                  <span>{topThree[0].address}</span>
+                </p>
+              )}
 
               <div className="mt-5 pt-4 border-t border-amber-200/80 w-full flex items-center justify-around bg-amber-50/50 rounded-2xl p-3">
                 <div>
@@ -371,6 +384,12 @@ export const LeaderboardView: React.FC = () => {
               </h3>
               <p className="text-xs text-blue-700 font-bold mt-0.5">{topThree[2].course}</p>
               <p className="text-[11px] text-slate-400">{topThree[2].department}</p>
+              {topThree[2].address && (
+                <p className="text-[10px] text-amber-800 font-semibold flex items-center gap-1 mt-1">
+                  <MapPin className="w-2.5 h-2.5 text-rose-500 shrink-0" />
+                  <span>{topThree[2].address}</span>
+                </p>
+              )}
 
               <div className="mt-5 pt-4 border-t border-slate-100 w-full flex items-center justify-around">
                 <div>
@@ -566,6 +585,12 @@ export const LeaderboardView: React.FC = () => {
                     </h4>
                     <p className="text-xs text-blue-700 font-semibold truncate">{std.course}</p>
                     <p className="text-[11px] text-slate-500 truncate">{std.department}</p>
+                    {std.address && (
+                      <p className="text-[10px] text-amber-700 font-medium flex items-center gap-1 mt-0.5 truncate">
+                        <MapPin className="w-2.5 h-2.5 text-rose-500 shrink-0" />
+                        <span>{std.address}</span>
+                      </p>
+                    )}
                     <span className="inline-block mt-1 text-[10px] text-slate-400 font-medium">Batch of {std.batch}</span>
                   </div>
                 </div>
@@ -658,7 +683,15 @@ export const LeaderboardView: React.FC = () => {
                             <span className="font-extrabold text-slate-900 block group-hover:text-blue-700 transition-colors">
                               {std.name}
                             </span>
-                            <span className="text-[10px] text-slate-400 font-mono">{std.admissionNumber}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] text-slate-400 font-mono">{std.admissionNumber}</span>
+                              {std.address && (
+                                <span className="text-[10px] text-amber-700 font-medium flex items-center gap-0.5">
+                                  <MapPin className="w-2.5 h-2.5 text-rose-500 shrink-0" />
+                                  <span>{std.address}</span>
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </td>
@@ -759,6 +792,12 @@ export const LeaderboardView: React.FC = () => {
                     <p className="text-[11px] text-slate-300">
                       {selectedStudent.department} • Batch of {selectedStudent.batch}
                     </p>
+                    {selectedStudent.address && (
+                      <p className="text-xs text-amber-300 font-semibold flex items-center gap-1.5 mt-1 bg-white/10 px-2.5 py-0.5 rounded-lg w-fit border border-amber-300/30">
+                        <MapPin className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+                        <span>Address: {selectedStudent.address}</span>
+                      </p>
+                    )}
                   </div>
                 </div>
 

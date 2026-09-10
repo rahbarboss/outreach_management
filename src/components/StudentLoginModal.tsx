@@ -15,6 +15,7 @@ import {
   ArrowLeft,
   CheckCircle2,
   Lock,
+  MapPin,
 } from 'lucide-react';
 
 export const StudentLoginModal: React.FC = () => {
@@ -159,7 +160,14 @@ export const StudentLoginModal: React.FC = () => {
                         {std.name}
                       </h4>
                       <p className="text-xs text-slate-600 truncate">{std.course}</p>
-                      <p className="text-[11px] text-slate-400 truncate">{std.department}</p>
+                      {std.address ? (
+                        <p className="text-[11px] text-amber-700 font-medium flex items-center gap-1 mt-0.5 truncate">
+                          <MapPin className="w-3 h-3 text-rose-500 shrink-0" />
+                          <span>{std.address}</span>
+                        </p>
+                      ) : (
+                        <p className="text-[11px] text-slate-400 truncate">{std.department}</p>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -193,6 +201,12 @@ export const StudentLoginModal: React.FC = () => {
                   <h4 className="text-base font-bold text-slate-900">{selectedStudent.name}</h4>
                   <p className="text-xs text-slate-600 font-medium">{selectedStudent.course}</p>
                   <p className="text-[11px] text-slate-500">{selectedStudent.department}</p>
+                  {selectedStudent.address && (
+                    <p className="text-xs text-amber-700 font-semibold flex items-center gap-1 mt-1">
+                      <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                      <span>Address: {selectedStudent.address}</span>
+                    </p>
+                  )}
                 </div>
               </div>
 

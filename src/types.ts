@@ -23,6 +23,7 @@ export interface Student {
   name: string;
   email: string;
   phone?: string;
+  address?: string;
   course: string;
   department: string;
   batch: string;
