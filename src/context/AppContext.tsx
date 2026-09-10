@@ -242,7 +242,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     async function loadData() {
       setLoading(true);
       try {
-        const storedStudents = await getAllFromStore<Student>(STORES.STUDENTS);
+        let storedStudents = await getAllFromStore<Student>(STORES.STUDENTS);
         
         if (!storedStudents || storedStudents.length === 0) {
           // Empty DB: Seed with our comprehensive initial demo data
@@ -300,7 +300,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             getAllFromStore<Announcement>(STORES.ANNOUNCEMENTS),
           ]);
 
-          // Ensure all predefined students with their avatars and portfolios are preserved
+          // Ensure all predefined students with their avatars and portfolios are preserved and purge old domains
+          let studentsToSave = false;
+          const updatedStudents = storedStudents.map((s) => {
+            if (s.email && s.email.includes('@imperial.edu')) {
+              studentsToSave = true;
+              return { ...s, email: s.email.replace('@imperial.edu', '@dhiu.in') };
+            }
+            return s;
+          });
+          if (studentsToSave) {
+            await putManyInStore(STORES.STUDENTS, updatedStudents);
+            storedStudents = updatedStudents;
+          }
+
           const existingStudentIds = new Set(storedStudents.map((s) => s.id));
           const missingStudents = INITIAL_STUDENTS.filter((s) => !existingStudentIds.has(s.id));
           if (missingStudents.length > 0) {
@@ -360,6 +373,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             const updated: AppSettings = {
               ...INITIAL_SETTINGS,
               ...current,
+              address:
+                !current.address || current.address.includes('Academic Enclave') || current.address.includes('Knowledge Park')
+                  ? INITIAL_SETTINGS.address
+                  : current.address,
+              phone:
+                !current.phone || current.phone.includes('456-7890') || current.phone.includes('+1 (800)')
+                  ? INITIAL_SETTINGS.phone
+                  : current.phone,
+              email:
+                !current.email || current.email.includes('imperialcollege.edu') || current.email.includes('imperial')
+                  ? INITIAL_SETTINGS.email
+                  : current.email,
+              website:
+                !current.website || current.website.includes('imperialcollege.edu') || current.website.includes('imperial')
+                  ? INITIAL_SETTINGS.website
+                  : current.website,
               showAnnouncementBar: true,
               announcementBarText:
                 current.announcementBarText &&

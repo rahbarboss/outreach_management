@@ -74,6 +74,8 @@ import {
   Layout,
   GraduationCap,
   MapPin,
+  Phone,
+  Mail,
   UserCircle,
   Megaphone,
 } from 'lucide-react';
@@ -2627,6 +2629,50 @@ export const AdminPanel: React.FC = () => {
                 />
               </div>
 
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-slate-700 text-xs flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-blue-600" />
+                    <span>Institutional Campus</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={settings.address}
+                    onChange={(e) => updateSettings({ ...settings, address: e.target.value })}
+                    placeholder="Darul Huda Islamic University, Chemmad"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 bg-white"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-slate-700 text-xs flex items-center gap-1.5">
+                    <Phone className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Outreach Secretariat (Phone)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={settings.phone}
+                    onChange={(e) => updateSettings({ ...settings, phone: e.target.value })}
+                    placeholder="8521367782"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 bg-white"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-slate-700 text-xs flex items-center gap-1.5">
+                    <Mail className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Verification Desk (Email)</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={settings.email}
+                    onChange={(e) => updateSettings({ ...settings, email: e.target.value })}
+                    placeholder="outreach@dhiu.in"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 bg-white"
+                  />
+                </div>
+              </div>
+
               <div className="space-y-1.5">
                 <label className="font-semibold text-slate-700">Upload / Replace Institution Logo</label>
                 <input
@@ -2938,7 +2984,7 @@ export const AdminPanel: React.FC = () => {
                     type="email"
                     value={studentFormEmail}
                     onChange={(e) => setStudentFormEmail(e.target.value)}
-                    placeholder="student@imperial.edu"
+                    placeholder="student@dhiu.in"
                     className="w-full px-3.5 py-2 rounded-xl border border-slate-300"
                   />
                 </div>

@@ -92,15 +92,25 @@ export const Footer: React.FC = () => {
             <ul className="space-y-3 text-sm text-slate-400">
               <li className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
-                <span>{settings.address}</span>
+                <span className="leading-snug">{settings.address || 'Darul Huda Islamic University, Chemmad'}</span>
               </li>
               <li className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-blue-400 shrink-0" />
-                <span>{settings.phone}</span>
+                <a
+                  href={`tel:${(settings.phone || '8521367782').replace(/[^0-9+]/g, '')}`}
+                  className="hover:text-blue-300 transition-colors"
+                >
+                  {settings.phone || '8521367782'}
+                </a>
               </li>
               <li className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-blue-400 shrink-0" />
-                <span>{settings.email}</span>
+                <a
+                  href={`mailto:${settings.email || 'outreach@dhiu.in'}`}
+                  className="hover:text-blue-300 transition-colors"
+                >
+                  {settings.email || 'outreach@dhiu.in'}
+                </a>
               </li>
             </ul>
           </div>
