@@ -18,7 +18,7 @@ import {
 } from '../types';
 
 const DB_NAME = 'SOMS_IndexedDB';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 export const STORES = {
   STUDENTS: 'students',
@@ -32,6 +32,7 @@ export const STORES = {
   NOTIFICATIONS: 'notifications',
   AUDIT_LOGS: 'auditLogs',
   SETTINGS: 'settings',
+  ANNOUNCEMENTS: 'announcements',
 } as const;
 
 export type StoreName = typeof STORES[keyof typeof STORES];

@@ -16,6 +16,7 @@ import {
   AppNotification,
   AuditLog,
   AppSettings,
+  Announcement,
   UserRole,
   SubmissionStatus,
 } from '../types';
@@ -68,6 +69,7 @@ interface AppContextType {
   notifications: AppNotification[];
   auditLogs: AuditLog[];
   settings: AppSettings;
+  announcements: Announcement[];
   loading: boolean;
   
   // Modals & Triggers
@@ -145,6 +147,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [settings, setSettings] = useState<AppSettings>(INITIAL_SETTINGS);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
 
   const [loading, setLoading] = useState<boolean>(true);
   const [toast, setToast] = useState<ToastState | null>(null);
@@ -904,6 +907,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (item) await putInStore(STORES.NOTIFICATIONS, item);
   };
 
+
+  const saveAnnouncement = async (announcement: Announcement) => {
+    const nextAnnouncements = announcements.some((a) => a.id === announcement.id)
+      ? announcements.map((a) => (a.id === announcement.id ? announcement : a))
+      : [...announcements, announcement];
+    setAnnouncements(nextAnnouncements.sort((a, b) => a.displayOrder - b.displayOrder));
+    await putInStore(STORES.ANNOUNCEMENTS, announcement);
+    showToast('Announcement saved.', 'success');
+  };
+
+  const deleteAnnouncement = async (id: string) => {
+    const nextAnnouncements = announcements.filter((a) => a.id !== id);
+    setAnnouncements(nextAnnouncements);
+    await deleteFromStore(STORES.ANNOUNCEMENTS, id);
+    showToast('Announcement deleted.', 'info');
+  };
+
   // Full Database Reset to Default
   const resetDatabaseToDefault = async () => {
     for (const store of Object.values(STORES)) {
@@ -959,6 +979,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         notifications,
         auditLogs,
         settings,
+        announcements,
         loading,
         showAdminLoginModal,
         setShowAdminLoginModal,
@@ -994,6 +1015,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         deleteBadge,
         issueNewCertificate,
         updateSettings,
+        saveAnnouncement,
+        deleteAnnouncement,
         resetDatabaseToDefault,
         markNotificationRead,
       }}

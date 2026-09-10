@@ -34,6 +34,8 @@ export interface Student {
   pendingCount: number;
   rank?: number;
   bio?: string;
+  isPublicProfileEnabled?: boolean;
+  publicBio?: string;
   createdAt: string;
 }
 
@@ -216,4 +218,15 @@ export interface AppSettings {
   heroShowStats?: boolean;
   showAnnouncementBar?: boolean;
   announcementBarText?: string;
+}
+
+export interface Announcement {
+  id: string;
+  title: string;
+  message: string;
+  link?: string;
+  displayOrder: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }

@@ -7,6 +7,7 @@ import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
+import { AnnouncementBar } from './components/AnnouncementBar';
 import { PublicHome } from './components/PublicHome';
 import { AchievementsView } from './components/AchievementsView';
 import { PublicationsView } from './components/PublicationsView';
@@ -20,7 +21,7 @@ import { VerificationModal } from './components/VerificationModal';
 import { Toast } from './components/Toast';
 
 const MainLayout: React.FC = () => {
-  const { activeView, isLoading } = useApp();
+  const { activeView, isLoading, announcements } = useApp();
 
   if (isLoading) {
     return (
@@ -42,6 +43,7 @@ const MainLayout: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans selection:bg-blue-600 selection:text-white">
       {/* Navigation Header */}
       <Header />
+      <AnnouncementBar announcements={announcements} />
 
       {/* Main Routed View */}
       <main className="flex-1">

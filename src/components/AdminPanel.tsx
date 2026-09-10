@@ -29,6 +29,8 @@ import {
   exportPointHistoryLedgerExcel,
 } from '../lib/excelExport';
 import { fileToBase64 } from '../lib/db';
+import { AdminPublicProfilesTab } from './AdminPublicProfilesTab';
+import { AdminAnnouncementsTab } from './AdminAnnouncementsTab';
 import {
   LayoutDashboard,
   ShieldCheck,
@@ -72,6 +74,8 @@ import {
   Layout,
   GraduationCap,
   MapPin,
+  UserCircle,
+  Megaphone,
 } from 'lucide-react';
 
 export const AdminPanel: React.FC = () => {
@@ -96,6 +100,9 @@ export const AdminPanel: React.FC = () => {
     deleteActivity,
     addStudent,
     updateStudent,
+    announcements,
+    saveAnnouncement,
+    deleteAnnouncement,
     deleteStudent,
     toggleStudentStatus,
     savePointRule,
@@ -529,7 +536,11 @@ export const AdminPanel: React.FC = () => {
     { id: 'dashboard', label: 'Dashboard & Analytics', icon: LayoutDashboard },
     { id: 'front-page-admin', label: 'Front Page & Hero Editor', icon: Layout },
     { id: 'review-center', label: 'Review Center', icon: ShieldCheck, badge: submissions.filter((s) => s.status === 'pending').length },
+    
     { id: 'students', label: 'Student Accounts', icon: Users, badge: students.length },
+    { id: 'public-profiles', label: 'Public Profiles', icon: UserCircle },
+    { id: 'announcements', label: 'Announcements', icon: Megaphone },
+
     { id: 'modules-pub', label: 'Publications', icon: BookOpen },
     { id: 'modules-pres', label: 'Paper Presentations', icon: FileText },
     { id: 'modules-sem', label: 'Seminars & Colloquiums', icon: CalendarIcon },
@@ -1437,6 +1448,25 @@ export const AdminPanel: React.FC = () => {
         )}
 
         {/* TAB 4: INDIVIDUAL MODULES (PUBLICATIONS, PRESENTATIONS, ETC.) */}
+        
+        {activeAdminTab === 'public-profiles' && (
+          <AdminPublicProfilesTab
+            students={students}
+            updateStudent={updateStudent}
+            badges={badges}
+            featuredTitles={featuredTitles}
+          />
+        )}
+
+
+        {activeAdminTab === 'announcements' && (
+          <AdminAnnouncementsTab
+            announcements={announcements}
+            saveAnnouncement={saveAnnouncement}
+            deleteAnnouncement={deleteAnnouncement}
+          />
+        )}
+
         {activeAdminTab.startsWith('modules-') && (
           <div className="space-y-6">
             {(() => {

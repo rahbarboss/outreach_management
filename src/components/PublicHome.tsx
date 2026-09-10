@@ -3,11 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { PublicStudentProfileModal } from './PublicStudentProfileModal';
+import { Student } from '../types';
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { ActivitySubmission, ActivityCategory } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 import {
+
+
   Trophy,
   Award,
   BookOpen,
@@ -71,6 +75,8 @@ export const PublicHome: React.FC = () => {
     featuredTitles,
     settings,
     setShowStudentLoginModal,
+    certificates,
+    badges,
     setActiveView,
   } = useApp();
 
@@ -156,6 +162,7 @@ export const PublicHome: React.FC = () => {
 
   // Category Tab for Mini Gallery
   const [galleryCategory, setGalleryCategory] = useState<string>('all');
+  const [selectedStudentForProfile, setSelectedStudentForProfile] = useState<Student | null>(null);
   const filteredGallerySubs = approvedSubmissions.filter((s) => {
     if (galleryCategory === 'all') return true;
     return s.category === galleryCategory;
@@ -1276,7 +1283,8 @@ export const PublicHome: React.FC = () => {
                   viewport={{ once: true }}
                   transition={{ duration: 0.45, delay: idx * 0.08, ease: [0.22, 1, 0.36, 1] }}
                   whileHover={{ scale: 1.015, x: 4, backgroundColor: 'rgba(255,255,255,0.08)' }}
-                  className="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-white/5 border border-white/10 transition-colors shadow-2xs cursor-pointer group"
+                  className={`flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-white/5 border border-white/10 transition-colors shadow-2xs group ${std.isPublicProfileEnabled ? "cursor-pointer hover:bg-white/10" : ""}`}
+                  onClick={() => { if (std.isPublicProfileEnabled) setSelectedStudentForProfile(std); }}
                 >
                   <div className="flex items-center gap-3.5">
                     <span className="w-7 text-center font-black text-amber-400 text-sm sm:text-base">
@@ -1438,6 +1446,18 @@ export const PublicHome: React.FC = () => {
             </div>
           </motion.div>
         </div>
+      )}
+
+
+      {selectedStudentForProfile && (
+        <PublicStudentProfileModal
+          student={selectedStudentForProfile}
+          submissions={submissions.filter(s => s.studentId === selectedStudentForProfile.id)}
+          certificates={certificates}
+          featuredTitles={featuredTitles}
+          badges={badges}
+          onClose={() => setSelectedStudentForProfile(null)}
+        />
       )}
 
     </div>

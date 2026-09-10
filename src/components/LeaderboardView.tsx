@@ -3,12 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import { PublicStudentProfileModal } from './PublicStudentProfileModal';
+import { Student } from '../types';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { exportLeaderboardPDF, exportStudentReportPDF } from '../lib/pdfExport';
-import { Student, ActivitySubmission } from '../types';
+import { ActivitySubmission } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 import {
+
   Trophy,
   Award,
   Search,
@@ -35,8 +38,9 @@ import {
 } from 'lucide-react';
 
 export const LeaderboardView: React.FC = () => {
-  const { students, submissions, settings } = useApp();
+  const { students, submissions, settings, certificates, featuredTitles, badges } = useApp();
   const [departmentFilter, setDepartmentFilter] = useState('all');
+  const [selectedStudentForProfile, setSelectedStudentForProfile] = useState<Student | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'points' | 'honors' | 'name'>('points');
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('cards');
@@ -902,6 +906,18 @@ export const LeaderboardView: React.FC = () => {
           </div>
         )}
       </AnimatePresence>
+
+      {selectedStudentForProfile && (
+        <PublicStudentProfileModal
+          student={selectedStudentForProfile}
+          submissions={submissions.filter(s => s.studentId === selectedStudentForProfile.id)}
+          certificates={certificates}
+          featuredTitles={featuredTitles}
+          badges={badges}
+          onClose={() => setSelectedStudentForProfile(null)}
+        />
+      )}
+
     </div>
   );
 };
