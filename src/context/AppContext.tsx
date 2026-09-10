@@ -40,6 +40,7 @@ import {
   INITIAL_CERTIFICATES,
   INITIAL_AUDIT_LOGS,
   INITIAL_NOTIFICATIONS,
+  INITIAL_ANNOUNCEMENTS,
 } from '../lib/initialData';
 
 interface ToastState {
@@ -147,7 +148,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [settings, setSettings] = useState<AppSettings>(INITIAL_SETTINGS);
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [announcements, setAnnouncements] = useState<Announcement[]>(INITIAL_ANNOUNCEMENTS);
 
   const [loading, setLoading] = useState<boolean>(true);
   const [toast, setToast] = useState<ToastState | null>(null);
@@ -256,6 +257,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           await putManyInStore(STORES.CERTIFICATES, INITIAL_CERTIFICATES);
           await putManyInStore(STORES.AUDIT_LOGS, INITIAL_AUDIT_LOGS);
           await putManyInStore(STORES.NOTIFICATIONS, INITIAL_NOTIFICATIONS);
+          await putManyInStore(STORES.ANNOUNCEMENTS, INITIAL_ANNOUNCEMENTS);
           await putInStore(STORES.SETTINGS, { ...INITIAL_SETTINGS, id: 'main_settings' });
 
           setStudents(INITIAL_STUDENTS);
@@ -268,6 +270,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           setCertificates(INITIAL_CERTIFICATES);
           setAuditLogs(INITIAL_AUDIT_LOGS);
           setNotifications(INITIAL_NOTIFICATIONS);
+          setAnnouncements(INITIAL_ANNOUNCEMENTS);
           setSettings(INITIAL_SETTINGS);
         } else {
           // Load stored data
@@ -282,6 +285,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             loadedNotifs,
             loadedAudit,
             loadedSettings,
+            loadedAnnouncements,
           ] = await Promise.all([
             getAllFromStore<ActivitySubmission>(STORES.SUBMISSIONS),
             getAllFromStore<PointRule>(STORES.POINT_RULES),
@@ -293,23 +297,75 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             getAllFromStore<AppNotification>(STORES.NOTIFICATIONS),
             getAllFromStore<AuditLog>(STORES.AUDIT_LOGS),
             getAllFromStore<AppSettings & { id: string }>(STORES.SETTINGS),
+            getAllFromStore<Announcement>(STORES.ANNOUNCEMENTS),
           ]);
 
+          // Ensure all predefined students with their avatars and portfolios are preserved
+          const existingStudentIds = new Set(storedStudents.map((s) => s.id));
+          const missingStudents = INITIAL_STUDENTS.filter((s) => !existingStudentIds.has(s.id));
+          if (missingStudents.length > 0) {
+            await putManyInStore(STORES.STUDENTS, missingStudents);
+            storedStudents.push(...missingStudents);
+          }
+
+          // Ensure all submissions with their photos, articles, and proof certificates are preserved
+          const allSubs = loadedSubs || [];
+          const existingSubIds = new Set(allSubs.map((s) => s.id));
+          const missingSubs = INITIAL_SUBMISSIONS.filter((s) => !existingSubIds.has(s.id));
+          if (missingSubs.length > 0) {
+            await putManyInStore(STORES.SUBMISSIONS, missingSubs);
+            allSubs.push(...missingSubs);
+          }
+
+          // Ensure announcements are loaded and permanent INITIAL_ANNOUNCEMENTS (Monthly Assembly) is preserved
+          let finalAnnouncements: Announcement[] = [];
+          if (!loadedAnnouncements || loadedAnnouncements.length === 0) {
+            await putManyInStore(STORES.ANNOUNCEMENTS, INITIAL_ANNOUNCEMENTS);
+            finalAnnouncements = INITIAL_ANNOUNCEMENTS;
+          } else {
+            const existingAnnIds = new Set(loadedAnnouncements.map((a) => a.id));
+            const missingAnns = INITIAL_ANNOUNCEMENTS.filter((a) => !existingAnnIds.has(a.id));
+            if (missingAnns.length > 0) {
+              await putManyInStore(STORES.ANNOUNCEMENTS, missingAnns);
+              finalAnnouncements = [...loadedAnnouncements, ...missingAnns];
+            } else {
+              finalAnnouncements = loadedAnnouncements;
+            }
+          }
+
+          // Ensure featured titles, badges, certificates exist
+          const finalFeatured = loadedFeatured?.length ? loadedFeatured : INITIAL_FEATURED_TITLES;
+          if (!loadedFeatured?.length) await putManyInStore(STORES.FEATURED_TITLES, INITIAL_FEATURED_TITLES);
+
+          const finalBadges = loadedBadges?.length ? loadedBadges : INITIAL_BADGES;
+          if (!loadedBadges?.length) await putManyInStore(STORES.BADGES, INITIAL_BADGES);
+
+          const finalCerts = loadedCerts?.length ? loadedCerts : INITIAL_CERTIFICATES;
+          if (!loadedCerts?.length) await putManyInStore(STORES.CERTIFICATES, INITIAL_CERTIFICATES);
+
           setStudents(storedStudents);
-          setSubmissions(loadedSubs);
+          setSubmissions(allSubs);
           setPointRules(loadedPointRules.length ? loadedPointRules : INITIAL_POINT_RULES);
           setRankRules(loadedRankRules.length ? loadedRankRules : INITIAL_RANK_RULES);
           setPointHistory(loadedHistory);
-          setFeaturedTitles(loadedFeatured);
-          setBadges(loadedBadges.length ? loadedBadges : INITIAL_BADGES);
-          setCertificates(loadedCerts);
+          setFeaturedTitles(finalFeatured);
+          setBadges(finalBadges);
+          setCertificates(finalCerts);
           setNotifications(loadedNotifs);
           setAuditLogs(loadedAudit);
+          setAnnouncements(finalAnnouncements.sort((a, b) => a.displayOrder - b.displayOrder));
+
           if (loadedSettings.length > 0) {
             const current = loadedSettings[0];
             const updated: AppSettings = {
               ...INITIAL_SETTINGS,
               ...current,
+              showAnnouncementBar: true,
+              announcementBarText:
+                current.announcementBarText &&
+                current.announcementBarText !== 'Welcome to the Official Academic Achievement & Outreach Portal 2025-2026'
+                  ? current.announcementBarText
+                  : INITIAL_SETTINGS.announcementBarText,
               heroHeadingPrefix:
                 !current.heroHeadingPrefix || current.heroHeadingPrefix === 'Students Outreach Management'
                   ? 'Students Outreach'
@@ -324,10 +380,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             };
             setSettings(updated);
             await putInStore(STORES.SETTINGS, { ...updated, id: 'main_settings' });
+          } else {
+            setSettings(INITIAL_SETTINGS);
+            await putInStore(STORES.SETTINGS, { ...INITIAL_SETTINGS, id: 'main_settings' });
           }
 
           // Ensure student points and ranks stay strictly synchronized
-          await syncStudentPointsAndRanks(loadedSubs, storedStudents);
+          await syncStudentPointsAndRanks(allSubs, storedStudents);
         }
 
         // Check if there was a saved session
@@ -977,6 +1036,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     await putManyInStore(STORES.CERTIFICATES, INITIAL_CERTIFICATES);
     await putManyInStore(STORES.AUDIT_LOGS, INITIAL_AUDIT_LOGS);
     await putManyInStore(STORES.NOTIFICATIONS, INITIAL_NOTIFICATIONS);
+    await putManyInStore(STORES.ANNOUNCEMENTS, INITIAL_ANNOUNCEMENTS);
     await putInStore(STORES.SETTINGS, { ...INITIAL_SETTINGS, id: 'main_settings' });
 
     setStudents(INITIAL_STUDENTS);
@@ -989,6 +1049,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setCertificates(INITIAL_CERTIFICATES);
     setAuditLogs(INITIAL_AUDIT_LOGS);
     setNotifications(INITIAL_NOTIFICATIONS);
+    setAnnouncements(INITIAL_ANNOUNCEMENTS);
     setSettings(INITIAL_SETTINGS);
 
     showToast('Database reset to institutional demonstration state.', 'info');

@@ -31,14 +31,19 @@ export const AnnouncementBar: React.FC<Props> = ({ announcements }) => {
             className="absolute whitespace-nowrap flex gap-12 text-sm font-medium"
           >
             {activeAnnouncements.map((ann, idx) => (
-              <span key={ann.id || idx} className="inline-flex items-center gap-2">
-                {ann.message}
+              <span key={ann.id || idx} className="inline-flex items-center gap-2.5">
+                {ann.title && (
+                  <span className="px-2 py-0.5 rounded-md bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wide shadow-xs">
+                    {ann.title}
+                  </span>
+                )}
+                <span className="text-white font-medium">{ann.message}</span>
                 {ann.link && (
-                  <a href={ann.link} target="_blank" rel="noopener noreferrer" className="underline text-amber-200 hover:text-white transition-colors">
+                  <a href={ann.link} target="_blank" rel="noopener noreferrer" className="underline text-amber-200 hover:text-white transition-colors text-xs font-semibold ml-1">
                     Learn More
                   </a>
                 )}
-                {idx !== activeAnnouncements.length - 1 && <span className="text-blue-400 mx-4">•</span>}
+                {idx !== activeAnnouncements.length - 1 && <span className="text-blue-300/60 mx-4">•</span>}
               </span>
             ))}
           </motion.div>

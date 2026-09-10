@@ -15,6 +15,7 @@ import {
   AppNotification,
   AuditLog,
   AppSettings,
+  Announcement,
 } from '../types';
 
 export const INITIAL_SETTINGS: AppSettings = {
@@ -43,8 +44,8 @@ export const INITIAL_SETTINGS: AppSettings = {
   heroSecondaryBtnText: 'Student Login',
   heroShowBadge: true,
   heroShowStats: true,
-  showAnnouncementBar: false,
-  announcementBarText: 'Welcome to the Official Academic Achievement & Outreach Portal 2025-2026',
+  showAnnouncementBar: true,
+  announcementBarText: 'Monthly Assembly: The August assembly will be held on September 15 at the CHS Conference Hall.',
 };
 
 export const INITIAL_POINT_RULES: PointRule[] = [
@@ -1322,3 +1323,16 @@ export const INITIAL_NOTIFICATIONS: AppNotification[] = [
     createdAt: '2026-02-17T09:35:00Z',
   },
 ];
+
+export const INITIAL_ANNOUNCEMENTS: Announcement[] = [
+  {
+    id: 'ann-monthly-assembly',
+    title: 'Monthly Assembly',
+    message: 'The August assembly will be held on September 15 at the CHS Conference Hall.',
+    displayOrder: 1,
+    isActive: true,
+    createdAt: '2026-09-10T00:00:00.000Z',
+    updatedAt: '2026-09-10T00:00:00.000Z',
+  },
+];
+

@@ -147,9 +147,9 @@ export const AdminPanel: React.FC = () => {
   const [heroSecondaryBtnText, setHeroSecondaryBtnText] = useState(settings.heroSecondaryBtnText ?? 'Student Login');
   const [heroShowBadge, setHeroShowBadge] = useState(settings.heroShowBadge !== false);
   const [heroShowStats, setHeroShowStats] = useState(settings.heroShowStats !== false);
-  const [showAnnouncementBar, setShowAnnouncementBar] = useState(settings.showAnnouncementBar ?? false);
+  const [showAnnouncementBar, setShowAnnouncementBar] = useState(settings.showAnnouncementBar ?? true);
   const [announcementBarText, setAnnouncementBarText] = useState(
-    settings.announcementBarText ?? 'Welcome to the Official Academic Achievement & Outreach Portal 2025-2026'
+    settings.announcementBarText ?? 'Monthly Assembly: The August assembly will be held on September 15 at the CHS Conference Hall.'
   );
   const [isSavingHero, setIsSavingHero] = useState(false);
   const [heroSavedNotice, setHeroSavedNotice] = useState(false);
@@ -208,8 +208,8 @@ export const AdminPanel: React.FC = () => {
       heroSecondaryBtnText: 'Student Login',
       heroShowBadge: true,
       heroShowStats: true,
-      showAnnouncementBar: false,
-      announcementBarText: 'Welcome to the Official Academic Achievement & Outreach Portal 2025-2026',
+      showAnnouncementBar: true,
+      announcementBarText: 'Monthly Assembly: The August assembly will be held on September 15 at the CHS Conference Hall.',
     };
     setHeroBadgeText(defaults.heroBadgeText);
     setHeroHeadingPrefix(defaults.heroHeadingPrefix);
