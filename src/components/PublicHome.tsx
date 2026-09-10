@@ -516,7 +516,7 @@ export const PublicHome: React.FC = () => {
               Our Featured Students
             </h2>
             <p className="text-sm text-slate-600">
-              Celebrating Student Excellence • Conferred by Academic Dean & Outreach Council
+              Students Outreach Management • Conferred by Academic Dean & Outreach Council
             </p>
           </motion.div>
 
