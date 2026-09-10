@@ -4,6 +4,7 @@
  */
 
 import { PublicStudentProfileModal } from './PublicStudentProfileModal';
+import { MonthlyReportSection } from './MonthlyReportSection';
 import { Student } from '../types';
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
@@ -906,6 +907,11 @@ export const LeaderboardView: React.FC = () => {
           </div>
         )}
       </AnimatePresence>
+
+      <MonthlyReportSection onStudentClick={(id) => {
+          const std = students.find(s => s.id === id);
+          if (std) setSelectedStudentForProfile(std);
+        }} />
 
       {selectedStudentForProfile && (
         <PublicStudentProfileModal
